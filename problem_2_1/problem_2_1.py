@@ -18,7 +18,7 @@ from sklearn import cluster, datasets
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import homogeneity_score
 from sklearn.metrics import adjusted_rand_score as ARI
-from sklearn.metrics import adjusted_mutual_info_score as AMI
+from sklearn.metrics import silhouette_score as silhouette
 from itertools import cycle, islice
 
 np.random.seed(0)
@@ -46,6 +46,8 @@ plt.subplots_adjust(left=.02, right=.98, bottom=.001, top=.96, wspace=.05,
 plot1_num = 1
 plot2_num = 1
 
+test_init = np.array([[-15,0], [15,0]])
+
 default_base = {'n_neighbors': 10,
                 'n_clusters': 2}
 
@@ -68,7 +70,7 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     # ============
     kmeans = cluster.KMeans(n_clusters=params['n_clusters'])
     kmeans_rand = cluster.KMeans(n_clusters=params['n_clusters'], init='random')
-    kmeans_5 = cluster.KMeans(n_clusters=params['n_clusters'], n_init=5)
+    kmeans_pick = cluster.KMeans(n_clusters=params['n_clusters'], init=test_init, n_init=1)
     kmeans_20 = cluster.KMeans(n_clusters=params['n_clusters'], n_init=20, max_iter=500)
     complete = cluster.AgglomerativeClustering(n_clusters=params['n_clusters'], linkage='complete')
     average = cluster.AgglomerativeClustering(n_clusters=params['n_clusters'], linkage='average')
@@ -77,7 +79,7 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
     kmeans_variations = (
         ('KMeans_k++', kmeans),
         ('KMeans_random', kmeans_rand),
-        ('KMeans_5seeds', kmeans_5),
+        ('KMeans_pick', kmeans_pick),
         ('KMeans_20seeds', kmeans_20)
     )
 
@@ -132,7 +134,7 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         plt.text(.99, .11, ('Rand Index ' '%.3f' % (ARI(y, y_pred))).lstrip('0'),
                  transform=plt.gca().transAxes, size=10,
                  horizontalalignment='right')
-        plt.text(.99, .16, ('Mutual Info ' '%.3f' % (AMI(y, y_pred))).lstrip('0'),
+        plt.text(.99, .16, ('Silhouette score ' '%.3f' % (silhouette(X, y_pred, metric='euclidean', sample_size=n_samples))).lstrip('0'),
                  transform=plt.gca().transAxes, size=10,
                  horizontalalignment='right')
         plot1_num += 1
@@ -181,7 +183,7 @@ for i_dataset, (dataset, algo_params) in enumerate(datasets):
         plt.text(.99, .11, ('Rand Index ' '%.3f' % (ARI(y, y_pred))).lstrip('0'),
                  transform=plt.gca().transAxes, size=10,
                  horizontalalignment='right')
-        plt.text(.99, .16, ('Mutual Info ' '%.3f' % (AMI(y, y_pred))).lstrip('0'),
+        plt.text(.99, .16, ('Silhouette score ' '%.3f' % (silhouette(X, y_pred,metric='euclidean', sample_size=n_samples))).lstrip('0'),
                  transform=plt.gca().transAxes, size=10,
                  horizontalalignment='right')
         plot2_num += 1
